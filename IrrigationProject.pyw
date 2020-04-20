@@ -5,15 +5,19 @@ Class: BE 205
 Assignment: Drip-Sprinkler Irrigation Program
 
 Description:
-GUI program which generates a .txt output file
+GUI program which takes values of an irrigation system, 
+draws the system, then generates a report which is sent 
+to a .txt output file.
 '''
 
 # import statements
+import ctypes
 import tkinter
 from tkinter.filedialog import askopenfilename
 from tkinter.filedialog import asksaveasfilename
 import csv
 from graphics import *
+from math import *
 
 # function definitions
 
@@ -65,44 +69,37 @@ def table(w, x, y):
     table1.draw(w)
     return table1
 
-def paramprompt_text(w, x, y):
+def paramprompt(w, x, y):
     # make the text
     qnot = Text(Point(x/10,y/20), "Qo (Litres/Hr)").draw(w)
-    po = Text(Point(x/10,(y/20)+20), "Po (Pa)").draw(w)
+    pnot = Text(Point(x/10,(y/20)+20), "Po (Pa)").draw(w)
     sectlen = Text(Point(x/10,(y/20)+40), "Section Length (m)").draw(w)
-    numlaterals = Text(Point(x/10,(y/20)+60), "Number of Laterals").draw(w)
-    orfkval = Text(Point(x/10,(y/20)+80), "Orifice k Value").draw(w)
-    orfxval = Text(Point(x/10,(y/20)+100), "Orifice x Value").draw(w)
-    maindiam = Text(Point(x/10,(y/20)+120), "Main Pipe Diameter (m)").draw(w)
+    numlat = Text(Point(x/10,(y/20)+60), "Number of Laterals").draw(w)
+    orfk = Text(Point(x/10,(y/20)+80), "Orifice k Value").draw(w)
+    orfx = Text(Point(x/10,(y/20)+100), "Orifice x Value").draw(w)
+    diam = Text(Point(x/10,(y/20)+120), "Main Pipe Diameter (m)").draw(w)
     cval = Text(Point(x/10,(y/20)+140), "C Value").draw(w)
-    qnot.setSize(12), po.setSize(12), sectlen.setSize(12), numlaterals.setSize(12), orfkval.setSize(12), orfxval.setSize(12), maindiam.setSize(12), cval.setSize(12)
-    return qnot, po, sectlen, numlaterals, orfkval, orfxval, maindiam, cval
-
-def paramprompt_boxes(w, x, y):
+    qnot.setSize(12), pnot.setSize(12), sectlen.setSize(12), numlat.setSize(12), orfk.setSize(12), orfx.setSize(12), diam.setSize(12), cval.setSize(12)
     # make the entry boxes
     qnot_in = Entry(Point((x/4.5),y/20), int(x/100)).draw(w)
-    po_in = Entry(Point(x/4.5,(y/20)+20), int(x/100)).draw(w)
+    pnot_in = Entry(Point(x/4.5,(y/20)+20), int(x/100)).draw(w)
     sectlen_in = Entry(Point(x/4.5,(y/20)+40), int(x/100)).draw(w)
-    numlaterals_in = Entry(Point(x/4.5,(y/20)+60), int(x/100)).draw(w)
-    orfkval_in = Entry(Point(x/4.5,(y/20)+80), int(x/100)).draw(w)
-    orfxval_in = Entry(Point(x/4.5,(y/20)+100), int(x/100)).draw(w)
-    maindiam_in = Entry(Point(x/4.5,(y/20)+120), int(x/100)).draw(w)
+    numlat_in = Entry(Point(x/4.5,(y/20)+60), int(x/100)).draw(w)
+    orfk_in = Entry(Point(x/4.5,(y/20)+80), int(x/100)).draw(w)
+    orfx_in = Entry(Point(x/4.5,(y/20)+100), int(x/100)).draw(w)
+    diam_in = Entry(Point(x/4.5,(y/20)+120), int(x/100)).draw(w)
     cval_in = Entry(Point(x/4.5,(y/20)+140), int(x/100)).draw(w)
-    qnot_in.setFill('white'), po_in.setFill('white'), sectlen_in.setFill('white'), numlaterals_in.setFill('white'), orfkval_in.setFill('white'), orfxval_in.setFill('white'), maindiam_in.setFill('white'), cval_in.setFill('white')
-    qnot_in.setText("9600.0"), po_in.setText("207000.0"), sectlen_in.setText("10.0"), numlaterals_in.setText("13"), orfkval_in.setText("0.95"), orfxval_in.setText("0.55"), maindiam_in.setText("0.1"), cval_in.setText("130.0")
-    return qnot_in, po_in, sectlen_in, numlaterals_in, orfkval_in, orfxval_in, maindiam_in, cval_in
-
-def paramprompts(qnot_in, po_in, sectlen_in, numlaterals_in, orfkval_in, orfxval_in, maindiam_in, cval_in):
-    # get the final texts
+    qnot_in.setFill('white'), pnot_in.setFill('white'), sectlen_in.setFill('white'), numlat_in.setFill('white'), orfk_in.setFill('white'), orfx_in.setFill('white'), diam_in.setFill('white'), cval_in.setFill('white')
+    qnot_in.setText("9600.0"), pnot_in.setText("207000.0"), sectlen_in.setText("10.0"), numlat_in.setText("13"), orfk_in.setText("0.95"), orfx_in.setText("0.55"), diam_in.setText("0.1"), cval_in.setText("130.0")
+    # determine final values
     qnot_val = qnot_in.getText()
-    po_val = po_in.getText()
+    pnot_val = pnot_in.getText()
     sectlen_val = sectlen_in.getText()
-    numlaterals_val = numlaterals_in.getText()
-    orfkval_val = orfkval_in.getText()
-    orfxval_val = orfxval_in.getText()
-    maindiam_val = maindiam_in.getText()
+    numlat_val = numlat_in.getText()
+    orfk_val = orfk_in.getText()
+    orfx_val = orfx_in.getText()
+    diam_val = diam_in.getText()
     cval_val = cval_in.getText()
-    return qnot_val, po_val, sectlen_val, numlaterals_val, orfkval_val, orfxval_val, maindiam_val, cval_val
 
 def paramdisplay(w, x, y, qnot, pnot, sectlen, numlat, orfk, orfx, diam, cval):
     qnot = Text(Point(x/10,y/20), "qnot: " + qnot).draw(w)
@@ -115,10 +112,6 @@ def paramdisplay(w, x, y, qnot, pnot, sectlen, numlat, orfk, orfx, diam, cval):
     cval = Text(Point(x/10,(y/20)+140), "C Value: " + cval).draw(w)
 #==========================================================
 def main():
-    '''
-    Write a description of what happens when you run
-    this file here.
-    '''
     # display 1
     w, x, y = getScsz("Drip/Sprinkler Irrigation System by Dr. Tamimi")
     logo = beLogo(w,x,y)
@@ -128,17 +121,16 @@ def main():
     logo.undraw()
     # display 2
     table1 = table(w,x,y)
-    qnot_txt, pnot_txt, sectlen_txt, numlat_txt, orfk_txt, orfx_txt, diam_txt, cval_txt = paramprompt_text(w,x,y)
-    qnot_box, pnot_box, sectlen_box, numlat_box, orfk_box, orfx_box, diam_box, cval_box = paramprompt_boxes(w,x,y)
-    qnot, pnot, sectlen, numlat, orfk, orfx, diam, cval = paramprompts(qnot_box, pnot_box, sectlen_box, numlat_box, orfk_box, orfx_box, diam_box, cval_box)
+    paramprompt(w, x, y)
     okBox(w,x,y, "Please Change Default Values as Needed and Click Here to Draw the Irrigation Sysytem", "black", "light blue")
-    qnot_txt.undraw(), pnot_txt.undraw(), sectlen_txt.undraw(), numlat_txt.undraw(), orfk_txt.undraw(), orfx_txt.undraw(), diam_txt.undraw(), cval_txt.undraw()
-    qnot_box.undraw(), pnot_box.undraw(), sectlen_box.undraw(), numlat_box.undraw(), orfk_box.undraw(), orfx_box.undraw(), diam_box.undraw(), cval_box.undraw()
     table1.undraw()
     # display 3
-    paramdisplay(w,x,y,qnot, pnot, sectlen, numlat, orfk, orfx, diam, cval)
-    okBox(w,x,y, "Please Change Default Values as Needed and Click Here to Draw the Irrigation Sysytem", "black", "light blue")
-
+    okBox(w,x,y, "Click Here to Calculate Flow Rates into Each Lateral/Sprinkler", "black", "yellow")
+    # display 4
+    okBox(w,x,y, "Analysis Complete. Click to Write Results/Table to Output File", "yellow", "dark blue")
+    # display 5
+    okBox(w,x,y, "Results are Saved. Click Here to EXIT Program", "black", "yellow")
+    w.close()
 
 if __name__ == '__main__':
     main()
