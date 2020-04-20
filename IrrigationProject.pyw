@@ -30,7 +30,7 @@ def beLogo(w, x, y):
     # "C:\\Users\\MAWaskow\\Documents\\School\\S20\\BE205\\GraphicsProjs\\BE.gif"
     beLogo = Image(Point(x/2, 60), "BE.gif")
     beLogo.draw(w)
-    return
+    return beLogo
 
 def instructions(w,x,y):
     line1 =Text(Point(x/2,200), "This program uses default input values and draws the irrigation system based on the Default Values.").draw(w)
@@ -43,13 +43,13 @@ def instructions(w,x,y):
 def okBox(w,x,y, msg, txtcolor, boxcolor):
     rw, rh = x/2, 60
     x1 = x/2 - rw/2
-    y1 = y/1.2 - rh/2
-    x2, y2 = x/2 + rw/2, y/1.2 + rh/2
+    y1 = y/2.5 - rh/2
+    x2, y2 = x/2 + rw/2, y/2.5 + rh/2
     # need to move rectangle to center of window
     btmR = Rectangle(Point(x1, y1), Point(x2,y2)).draw(w)
     btmR.setFill(boxcolor)
-    clickMouse = Text(Point(x/2, y/1.2), msg).draw(w)
-    clickMouse.setFace("arial"), clickMouse.setSize(14), clickMouse.setStyle("bold")
+    clickMouse = Text(Point(x/2, y/2.5), msg).draw(w)
+    clickMouse.setFace("arial"), clickMouse.setSize(13), clickMouse.setStyle("bold")
     clickMouse.setTextColor(txtcolor)
     while True:
         p = w.getMouse()
@@ -60,18 +60,63 @@ def okBox(w,x,y, msg, txtcolor, boxcolor):
     btmR.undraw()
     return
 
+def table(w, x, y):
+    table1 = Image(Point(x/2, y/1.5), "Table1.gif")
+    table1.draw(w)
+    return table1
+
+def paramprompts(w, x, y):
+    # make the text
+    qnot = Text(Point(x/10,y/20), "Qo (Litres/Hr)").draw(w)
+    po = Text(Point(x/10,(y/20)+20), "Po (Pa)").draw(w)
+    sectlen = Text(Point(x/10,(y/20)+40), "Section Length (m)").draw(w)
+    numlaterals = Text(Point(x/10,(y/20)+60), "Number of Laterals").draw(w)
+    orfkval = Text(Point(x/10,(y/20)+80), "Orifice k Value").draw(w)
+    orfxval = Text(Point(x/10,(y/20)+100), "Orifice x Value").draw(w)
+    maindiam = Text(Point(x/10,(y/20)+120), "Main Pipe Diameter (m)").draw(w)
+    cval = Text(Point(x/10,(y/20)+140), "C Value").draw(w)
+    qnot.setSize(12), po.setSize(12), sectlen.setSize(12), numlaterals.setSize(12), orfkval.setSize(12), orfxval.setSize(12), maindiam.setSize(12), cval.setSize(12)
+    # make the entry boxes
+    qnot_in = Entry(Point((x/4.5),y/20), int(x/100)).draw(w)
+    po_in = Entry(Point(x/4.5,(y/20)+20), int(x/100)).draw(w)
+    sectlen_in = Entry(Point(x/4.5,(y/20)+40), int(x/100)).draw(w)
+    numlaterals_in = Entry(Point(x/4.5,(y/20)+60), int(x/100)).draw(w)
+    orfkval_in = Entry(Point(x/4.5,(y/20)+80), int(x/100)).draw(w)
+    orfxval_in = Entry(Point(x/4.5,(y/20)+100), int(x/100)).draw(w)
+    maindiam_in = Entry(Point(x/4.5,(y/20)+120), int(x/100)).draw(w)
+    cval_in = Entry(Point(x/4.5,(y/20)+140), int(x/100)).draw(w)
+    qnot_in.setFill('white'), po_in.setFill('white'), sectlen_in.setFill('white'), numlaterals_in.setFill('white'), orfkval_in.setFill('white'), orfxval_in.setFill('white'), maindiam_in.setFill('white'), cval_in.setFill('white')
+    qnot_in.setText("9600.0"), po_in.setText("207000.0"), sectlen_in.setText("10.0"), numlaterals_in.setText("13"), orfkval_in.setText("0.95"), orfxval_in.setText("0.55"), maindiam_in.setText("0.1"), cval_in.setText("130.0")
+    # get the final texts
+    qnot_val = qnot_in.getText()
+    po_val = po_in.getText()
+    sectlen_val = sectlen_in.getText()
+    numlaterals_val = numlaterals_in.getText()
+    orfkval_val = orfkval_in.getText()
+    orfxval_val = orfxval_in.getText()
+    maindiam_val = maindiam_in.getText()
+    cval_val = cval_in.getText()
+    return qnot_val, po_val, sectlen_val, numlaterals_val, orfkval_val, orfxval_val, maindiam_val, cval_val
+
 #==========================================================
 def main():
     '''
     Write a description of what happens when you run
     this file here.
     '''
+    # display 1
     w, x, y = getScsz("Drip/Sprinkler Irrigation System by Dr. Tamimi")
-    beLogo(w,x,y)
-    line1, line2, line3, line4, line5, line6, line7, line8, line9 = instructions(w,x,y)
-    okBox(w,x,y, "Please Click Here to Continue", "dark blue", "pink")
-    line1.undraw(), line2.undraw(), line3.undraw(), line4.undraw(), line5.undraw(), line6.undraw(), line7.undraw(), line8.undraw(), line9.undraw()
+    logo = beLogo(w,x,y)
+    line1, line2, line3 = instructions(w,x,y)
+    okBox(w,x,y, "Please Click Here to Continue...", "white", "black")
+    line1.undraw(), line2.undraw(), line3.undraw()
+    logo.undraw()
+    # display 2
+    table(w,x,y)
+    qnot, pnot, sectlen, numlat, orfk, orfx, diam, cval = paramprompts(w,x,y)
 
+    okBox(w,x,y, "Please Change Default Values as Needed and Click Here to Draw the Irrigation Sysytem", "black", "light blue")
+    # display 3
 
 if __name__ == '__main__':
     main()
