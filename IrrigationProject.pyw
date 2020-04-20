@@ -65,7 +65,7 @@ def table(w, x, y):
     table1.draw(w)
     return table1
 
-def paramprompts(w, x, y):
+def paramprompt_text(w, x, y):
     # make the text
     qnot = Text(Point(x/10,y/20), "Qo (Litres/Hr)").draw(w)
     po = Text(Point(x/10,(y/20)+20), "Po (Pa)").draw(w)
@@ -76,6 +76,9 @@ def paramprompts(w, x, y):
     maindiam = Text(Point(x/10,(y/20)+120), "Main Pipe Diameter (m)").draw(w)
     cval = Text(Point(x/10,(y/20)+140), "C Value").draw(w)
     qnot.setSize(12), po.setSize(12), sectlen.setSize(12), numlaterals.setSize(12), orfkval.setSize(12), orfxval.setSize(12), maindiam.setSize(12), cval.setSize(12)
+    return qnot, po, sectlen, numlaterals, orfkval, orfxval, maindiam, cval
+
+def paramprompt_boxes(w, x, y):
     # make the entry boxes
     qnot_in = Entry(Point((x/4.5),y/20), int(x/100)).draw(w)
     po_in = Entry(Point(x/4.5,(y/20)+20), int(x/100)).draw(w)
@@ -87,6 +90,9 @@ def paramprompts(w, x, y):
     cval_in = Entry(Point(x/4.5,(y/20)+140), int(x/100)).draw(w)
     qnot_in.setFill('white'), po_in.setFill('white'), sectlen_in.setFill('white'), numlaterals_in.setFill('white'), orfkval_in.setFill('white'), orfxval_in.setFill('white'), maindiam_in.setFill('white'), cval_in.setFill('white')
     qnot_in.setText("9600.0"), po_in.setText("207000.0"), sectlen_in.setText("10.0"), numlaterals_in.setText("13"), orfkval_in.setText("0.95"), orfxval_in.setText("0.55"), maindiam_in.setText("0.1"), cval_in.setText("130.0")
+    return qnot_in, po_in, sectlen_in, numlaterals_in, orfkval_in, orfxval_in, maindiam_in, cval_in
+
+def paramprompts(qnot_in, po_in, sectlen_in, numlaterals_in, orfkval_in, orfxval_in, maindiam_in, cval_in):
     # get the final texts
     qnot_val = qnot_in.getText()
     po_val = po_in.getText()
@@ -98,6 +104,15 @@ def paramprompts(w, x, y):
     cval_val = cval_in.getText()
     return qnot_val, po_val, sectlen_val, numlaterals_val, orfkval_val, orfxval_val, maindiam_val, cval_val
 
+def paramdisplay(w, x, y, qnot, pnot, sectlen, numlat, orfk, orfx, diam, cval):
+    qnot = Text(Point(x/10,y/20), "qnot: " + qnot).draw(w)
+    po = Text(Point(x/10,(y/20)+20), "Po (Pa): "+ pnot).draw(w)
+    sectlen = Text(Point(x/10,(y/20)+40), "Section Length (m): " + sectlen).draw(w)
+    numlaterals = Text(Point(x/10,(y/20)+60), "Number of Laterals: " + numlat).draw(w)
+    orfkval = Text(Point(x/10,(y/20)+80), "Orifice k Value: " + orfk).draw(w)
+    orfxval = Text(Point(x/10,(y/20)+100), "Orifice x Value: " + orfx).draw(w)
+    maindiam = Text(Point(x/10,(y/20)+120), "Main Pipe Diameter (m): " + diam).draw(w)
+    cval = Text(Point(x/10,(y/20)+140), "C Value: " + cval).draw(w)
 #==========================================================
 def main():
     '''
@@ -112,11 +127,18 @@ def main():
     line1.undraw(), line2.undraw(), line3.undraw()
     logo.undraw()
     # display 2
-    table(w,x,y)
-    qnot, pnot, sectlen, numlat, orfk, orfx, diam, cval = paramprompts(w,x,y)
-
+    table1 = table(w,x,y)
+    qnot_txt, pnot_txt, sectlen_txt, numlat_txt, orfk_txt, orfx_txt, diam_txt, cval_txt = paramprompt_text(w,x,y)
+    qnot_box, pnot_box, sectlen_box, numlat_box, orfk_box, orfx_box, diam_box, cval_box = paramprompt_boxes(w,x,y)
+    qnot, pnot, sectlen, numlat, orfk, orfx, diam, cval = paramprompts(qnot_box, pnot_box, sectlen_box, numlat_box, orfk_box, orfx_box, diam_box, cval_box)
     okBox(w,x,y, "Please Change Default Values as Needed and Click Here to Draw the Irrigation Sysytem", "black", "light blue")
+    qnot_txt.undraw(), pnot_txt.undraw(), sectlen_txt.undraw(), numlat_txt.undraw(), orfk_txt.undraw(), orfx_txt.undraw(), diam_txt.undraw(), cval_txt.undraw()
+    qnot_box.undraw(), pnot_box.undraw(), sectlen_box.undraw(), numlat_box.undraw(), orfk_box.undraw(), orfx_box.undraw(), diam_box.undraw(), cval_box.undraw()
+    table1.undraw()
     # display 3
+    paramdisplay(w,x,y,qnot, pnot, sectlen, numlat, orfk, orfx, diam, cval)
+    okBox(w,x,y, "Please Change Default Values as Needed and Click Here to Draw the Irrigation Sysytem", "black", "light blue")
+
 
 if __name__ == '__main__':
     main()
