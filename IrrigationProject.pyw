@@ -17,7 +17,7 @@ from tkinter.filedialog import askopenfilename
 from tkinter.filedialog import asksaveasfilename
 import csv
 from graphics import *
-from math import *
+import math
 
 # function definitions
 
@@ -90,7 +90,10 @@ def paramprompt(w, x, y):
     diam_in = Entry(Point(x/4.5,(y/20)+120), int(x/100)).draw(w)
     cval_in = Entry(Point(x/4.5,(y/20)+140), int(x/100)).draw(w)
     qnot_in.setFill('white'), pnot_in.setFill('white'), sectlen_in.setFill('white'), numlat_in.setFill('white'), orfk_in.setFill('white'), orfx_in.setFill('white'), diam_in.setFill('white'), cval_in.setFill('white')
-    qnot_in.setText("9600.0"), pnot_in.setText("207000.0"), sectlen_in.setText("10.0"), numlat_in.setText("13"), orfk_in.setText("0.95"), orfx_in.setText("0.55"), diam_in.setText("0.1"), cval_in.setText("130.0")
+    qnot_in.setText("9500.0"), pnot_in.setText("207000.0"), sectlen_in.setText("10.0"), numlat_in.setText("13"), orfk_in.setText("0.95"), orfx_in.setText("0.55"), diam_in.setText("0.1"), cval_in.setText("130.0")
+    return qnot_in, pnot_in, sectlen_in, numlat_in, orfk_in, orfx_in, diam_in, cval_in
+
+def parachange(qnot_in, pnot_in, sectlen_in, numlat_in, orfk_in, orfx_in, diam_in, cval_in):
     # determine final values
     qnot_val = qnot_in.getText()
     pnot_val = pnot_in.getText()
@@ -100,35 +103,100 @@ def paramprompt(w, x, y):
     orfx_val = orfx_in.getText()
     diam_val = diam_in.getText()
     cval_val = cval_in.getText()
+    # initialize dictionary
+    irridict = {}
+    irridict["qnot"] = float(qnot_val)
+    irridict["pnot"] = float(pnot_val)
+    irridict["sectlen"] = float(sectlen_val)
+    irridict["numlat"] = float(numlat_val)
+    irridict["orfk"] = float(orfk_val)
+    irridict["orfx"] = float(orfx_val)
+    irridict["diam"] = float(diam_val)
+    irridict["cval"] = float(cval_val)
+    return irridict
 
-def paramdisplay(w, x, y, qnot, pnot, sectlen, numlat, orfk, orfx, diam, cval):
-    qnot = Text(Point(x/10,y/20), "qnot: " + qnot).draw(w)
-    po = Text(Point(x/10,(y/20)+20), "Po (Pa): "+ pnot).draw(w)
-    sectlen = Text(Point(x/10,(y/20)+40), "Section Length (m): " + sectlen).draw(w)
-    numlaterals = Text(Point(x/10,(y/20)+60), "Number of Laterals: " + numlat).draw(w)
-    orfkval = Text(Point(x/10,(y/20)+80), "Orifice k Value: " + orfk).draw(w)
-    orfxval = Text(Point(x/10,(y/20)+100), "Orifice x Value: " + orfx).draw(w)
-    maindiam = Text(Point(x/10,(y/20)+120), "Main Pipe Diameter (m): " + diam).draw(w)
-    cval = Text(Point(x/10,(y/20)+140), "C Value: " + cval).draw(w)
+def construct_dcts(qnot, pnot, sectlen, numlat, orfk, orfx, diam, cval):
+    # make dictionaries for pressure, flowrate, miniq, and hl
+    pressdct = {}
+    flowdct = {}
+    miniqdct = {}
+    hldct = {}
+    # initialize known values
+    pressdct[0] = pnot
+    flowdct[0] = qnot
+    miniqdct[0] = 0.0
+    hldct[0] = (1000.0)*(9.806)*((4*sectlen**(0.54)*qnot)/(math.pi*3600000*0.85*cval*(diam**2)*((diam/4)**0.63)))**(1/0.54)
+    # begin calculations
+    i = 1
+    while i <= numlat:
+        # determine pressdct
+        if flowdct[i-1] > 0:
+            pressdct[i] = pressdct[i-1] - hldct[i-1]
+        else:
+            pressdct[i] = 0
+        pressdct[i] = round(pressdct[i], 2)
+        # determine minidct
+        if orfk*(pressdct[i])**orfx <= flowdct[i-1]:
+            miniqdct[i] = orfk*pressdct[i]**orfx
+        else:
+            miniqdct[i] = flowdct[i-1]
+        miniqdct[i] = round(miniqdct[i], 5)
+        # determine flowdct
+        flowdct[i] = flowdct[i-1] - miniqdct[i]
+        flowdct[i] = round(flowdct[i], 5)
+        # determine hldict
+        hldct[i] = (1000.0)*(9.806)*((4*sectlen**(0.54)*flowdct[i])/(math.pi*3600000*0.85*cval*(diam**2)*((diam/4)**0.63)))**(1/0.54)
+        i = i + 1
+    return pressdct, flowdct, miniqdct, hldct
+
+def pipelines(w, x, y, irrigationdictionary):
+    n = int(irrigationdictionary["numlat"])
+    div = x/(n+3)
+    mainpipetop = Line(Point(div, y*2/3), Point((n+1)*div, y*2/3)).draw(w)
+    mainpipebottom = Line(Point(div, (y*2/3)+20), Point((n+1)*div, (y*2/3)+20)).draw(w)
+    mainpipeend = Line(Point((n+1)*div, y*2/3), Point((n+1)*div, (y*2/3)+20)).draw(w)
+    for i in range(n+1):
+        Text(Point((i+1)*div, (y*2/3)-10), i).draw(w)
+    for i in range(n):
+        Line(Point((i+2)*div, (y*2/3)+20), Point((i+2)*div, y*19/20)).draw(w)
+        Line(Point((i+2)*div-5, (y*2/3)+20), Point((i+2)*div-5, y*19/20)).draw(w)
+
+def reportfile(irrigationdictionary, pressuredictionary, flowdictionary, miniqdictionary):
+    outfile= open(asksaveasfilename(), "w")
+    n = int(irrigationdictionary["numlat"])
+    print(("Node n").ljust(15), ("Flow Rate, Q").ljust(20), ("Pressure, P").ljust(20), ("Lateral Flow Rate, q").ljust(20), file = outfile)
+    print("="*80, file = outfile)
+    for i in range(n+1):
+        print(str(i).rjust(5), " "*10, str(flowdictionary[i]).rjust(10), " "*10, str(pressuredictionary[i]).rjust(10), " "*10, str(miniqdictionary[i]).rjust(10), file = outfile)
+    outfile.close()
+
 #==========================================================
 def main():
-    # display 1
+    #####Display 1#####
     w, x, y = getScsz("Drip/Sprinkler Irrigation System by Dr. Tamimi")
     logo = beLogo(w,x,y)
     line1, line2, line3 = instructions(w,x,y)
     okBox(w,x,y, "Please Click Here to Continue...", "white", "black")
     line1.undraw(), line2.undraw(), line3.undraw()
     logo.undraw()
-    # display 2
+    #####Display 2#####
     table1 = table(w,x,y)
-    paramprompt(w, x, y)
+    # get returns from parameters prompt
+    qnot_in, pnot_in, sectlen_in, numlat_in, orfk_in, orfx_in, diam_in, cval_in = paramprompt(w, x, y)
     okBox(w,x,y, "Please Change Default Values as Needed and Click Here to Draw the Irrigation Sysytem", "black", "light blue")
+    # get dictionary from the altered parameter entries
+    irridict = parachange(qnot_in, pnot_in, sectlen_in, numlat_in, orfk_in, orfx_in, diam_in, cval_in)
+    # initialize, calculate, and construct dictionaries from the parameters
+    pressdct, flowdct, miniqdct, hldct = construct_dcts(irridict["qnot"], irridict["pnot"], irridict["sectlen"], irridict["numlat"], irridict["orfk"], irridict["orfx"], irridict["diam"], irridict["cval"])
     table1.undraw()
-    # display 3
+    #####Display 3#####
+    # draw the pipelines
+    pipelines(w,x,y, irridict)
     okBox(w,x,y, "Click Here to Calculate Flow Rates into Each Lateral/Sprinkler", "black", "yellow")
-    # display 4
+    #####Display 4#####
+    reportfile(irridict, pressdct, flowdct, miniqdct)
     okBox(w,x,y, "Analysis Complete. Click to Write Results/Table to Output File", "yellow", "dark blue")
-    # display 5
+    #####Display 5#####
     okBox(w,x,y, "Results are Saved. Click Here to EXIT Program", "black", "yellow")
     w.close()
 
