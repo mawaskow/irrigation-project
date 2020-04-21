@@ -51,7 +51,7 @@ def construct_dcts(qnot, pnot, sectlen, numlat, orfk, orfx, diam, cval):
     hldct[0] = (1000.0)*(9.806)*((4*sectlen**(0.54)*qnot)/(math.pi*3600000*0.85*cval*(diam**2)*((diam/4)**0.63)))**(1/0.54)
     # begin calculations
     i = 1
-    while i > numlat:
+    while i <= numlat:
         # determine pressdct
         if flowdct[i-1] > 0:
             pressdct[i] = pressdct[i-1] - hldct[i-1]
