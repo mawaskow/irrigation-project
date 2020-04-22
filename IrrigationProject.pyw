@@ -194,9 +194,9 @@ def main():
     pipelines(w,x,y, irridict)
     okBox(w,x,y, "Click Here to Calculate Flow Rates into Each Lateral/Sprinkler", "black", "yellow")
     #####Display 4#####
-    reportfile(irridict, pressdct, flowdct, miniqdct)
     okBox(w,x,y, "Analysis Complete. Click to Write Results/Table to Output File", "yellow", "dark blue")
     #####Display 5#####
+    reportfile(irridict, pressdct, flowdct, miniqdct)
     okBox(w,x,y, "Results are Saved. Click Here to EXIT Program", "black", "yellow")
     w.close()
 
