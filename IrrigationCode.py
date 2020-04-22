@@ -31,7 +31,7 @@ def getvars():
     qnot = 9500.0
     pnot = 207000.0
     sectlen = 10.0
-    numlat = 13
+    numlat = 18
     orfk = 0.95
     orfx = 0.55
     diam = 0.1
@@ -57,26 +57,35 @@ def construct_dcts(qnot, pnot, sectlen, numlat, orfk, orfx, diam, cval):
             pressdct[i] = pressdct[i-1] - hldct[i-1]
         else:
             pressdct[i] = 0
+        pressdct[i] = round(pressdct[i], 0)
         # determine minidct
         if orfk*(pressdct[i])**orfx <= flowdct[i-1]:
             miniqdct[i] = orfk*pressdct[i]**orfx
         else:
             miniqdct[i] = flowdct[i-1]
+        miniqdct[i] = round(miniqdct[i], 1)
         # determine flowdct
         flowdct[i] = flowdct[i-1] - miniqdct[i]
+        flowdct[i] = round(flowdct[i], 1)
         # determine hldict
         hldct[i] = (1000.0)*(9.806)*((4*sectlen**(0.54)*flowdct[i])/(math.pi*3600000*0.85*cval*(diam**2)*((diam/4)**0.63)))**(1/0.54)
+        hldct[i] = round(hldct[i], 2)
         i = i + 1
-    print(pressdct)
-    print(flowdct)
-    print(miniqdct)
-    print(hldct)
+    return pressdct, flowdct, miniqdct, hldct
+
+def enddisplay(numlat, pressuredictionary, flowdictionary, miniqdictionary):
+    n = numlat
+    print(("Node n").ljust(15), ("Flow Rate, Q").ljust(20), ("Pressure, P").ljust(20), ("Lateral Flow Rate, q").ljust(20))
+    print("="*80)
+    for i in range(n+1):
+        print(str(i).rjust(5), " "*10, str(flowdictionary[i]).rjust(10), " "*10, str(pressuredictionary[i]).rjust(10), " "*10, str(miniqdictionary[i]).rjust(10))
+
 
 #==========================================================
 def main():
     qnot, pnot, sectlen, numlat, orfk, orfx, diam, cval = getvars()
-    construct_dcts(qnot, pnot, sectlen, numlat, orfk, orfx, diam, cval)
-
+    pressdct, flowdct, miniqdct, hldct = construct_dcts(qnot, pnot, sectlen, numlat, orfk, orfx, diam, cval)
+    enddisplay(numlat, pressdct, flowdct, miniqdct)
 
 
 if __name__ == '__main__':
