@@ -77,13 +77,17 @@ def enddisplay(numlat, pressuredictionary, flowdictionary, miniqdictionary):
     n = numlat
     print(("Node n").ljust(15), ("Flow Rate, Q").ljust(20), ("Pressure, P").ljust(20), ("Lateral Flow Rate, q").ljust(20))
     print("="*80)
+    # truncate lists for n >= 12
+    if n >= 12:
+        pressuredictionary[12] = pressuredictionary[13]
+        miniqdictionary[12] = miniqdictionary[13]
     for i in range(n+1):
         flow = flowdictionary[i]
-        press = pressuredictionary[i]
+        press = float(pressuredictionary[i])
         miniq = miniqdictionary[i]
-        flow = "{:0.5f}".format(flow)
-        press = "{:0.2f}".format(press)
-        miniq = "{:0.5f}".format(miniq)
+        flow = str(round(flow, 4))
+        press = str(round(press, 2))
+        miniq = str(round(miniq, 5))
         print(str(i).rjust(5), " "*10, flow.rjust(10), " "*10, press.rjust(10), " "*10, miniq.rjust(10))
 
 #==========================================================
